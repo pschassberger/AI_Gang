@@ -101,44 +101,28 @@ while game:
     for event in py.event.get():
         if event.type == py.QUIT:
             sys.exit()
-        key_input = py.key.get_pressed()
-        if event.type == py.MOUSEMOTION:
-            py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
-            position = event.pos[0]
-            if turn == 0:
-                py.draw.circle(screen, RED, (position, int(SIZE/2)), RADIUS)
-            else: 
-                py.draw.circle(screen, YELLOW, (position, int(SIZE/2)), RADIUS)
-        py.display.update()
 
-        if event.type == py.MOUSEBUTTONDOWN:
+
+        elif event.type == py.KEYDOWN:
+            
             py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
         
             # Ask for Player 1 Input
             if turn == 0:
-                position = event.pos[0]
-                col = int(math.floor(position/SIZE))
-    # check for key events
-    for event in py.event.get():
-        if event.type == py.QUIT:
-            sys.exit()
-
-        if event.type == py.MOUSEMOTION:
-            py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
-            position = event.pos[0]
-            if turn == 0:
-                py.draw.circle(screen, RED, (position, int(SIZE/2)), RADIUS)
-            else: 
-                py.draw.circle(screen, YELLOW, (position, int(SIZE/2)), RADIUS)
-        py.display.update()
-
-        if event.type == py.MOUSEBUTTONDOWN:
-            py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
-        
-            # Ask for Player 1 Input
-            if turn == 0:
-                position = event.pos[0]
-                col = int(math.floor(position/SIZE))
+                if event.key == py.K_0:
+                    col = 0
+                elif event.key == py.K_1:
+                    col = 1
+                elif event.key == py.K_2:
+                    col = 2
+                elif event.key == py.K_3:
+                    col = 3
+                elif event.key == py.K_4:
+                    col = 4
+                elif event.key == py.K_5:
+                    col = 5
+                elif event.key == py.K_6:
+                    col = 6
 
                 if valid_location(game_board, col):
                     row = next_open_row(game_board, col)
@@ -149,9 +133,21 @@ while game:
 
 
             # player 2 input
-            else:				
-                position = event.pos[0]
-                col = int(math.floor(position/SIZE))
+            else:
+                if event.key == py.K_0:
+                    col = 0
+                elif event.key == py.K_1:
+                    col = 1
+                elif event.key == py.K_2:
+                    col = 2
+                elif event.key == py.K_3:
+                    col = 3
+                elif event.key == py.K_4:
+                    col = 4
+                elif event.key == py.K_5:
+                    col = 5
+                elif event.key == py.K_6:
+                    col = 6
 
                 if valid_location(game_board, col):
                     row = next_open_row(game_board, col)
