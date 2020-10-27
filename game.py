@@ -34,6 +34,11 @@ def next_open_row(game_board, col):
 		if game_board[row][col] == 0:
 			return row
 
+# ai moves
+def ai_move():
+    col = int(input("Enter a column number: "))
+    return col
+
 def winning_move(game_board, player):
 	# Check horizontal locations for win
 	for c in range(COLUMN-3):
@@ -98,68 +103,43 @@ py.display.update()
 while game:
     
     # check for key events
-    for event in py.event.get():
+    '''for event in py.event.get():
         if event.type == py.QUIT:
-            sys.exit()
+            sys.exit()'''
 
 
-        elif event.type == py.KEYDOWN:
+    print(game_board)
             
-            py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
+    py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
         
-            # Ask for Player 1 Input
-            if turn == 0:
-                if event.key == py.K_0:
-                    col = 0
-                elif event.key == py.K_1:
-                    col = 1
-                elif event.key == py.K_2:
-                    col = 2
-                elif event.key == py.K_3:
-                    col = 3
-                elif event.key == py.K_4:
-                    col = 4
-                elif event.key == py.K_5:
-                    col = 5
-                elif event.key == py.K_6:
-                    col = 6
+     # Ask for Player 1 Input
+    if turn == 0:
+        
+        col = ai_move()
 
-                if valid_location(game_board, col):
-                    row = next_open_row(game_board, col)
-                    place_player(game_board, row, col, 1)
+        if valid_location(game_board, col):
+            row = next_open_row(game_board, col)
+            place_player(game_board, row, col, 1)
 
-                    if winning_move(game_board, 1):
-                        game = False
+            if winning_move(game_board, 1):
+                game = False
 
 
-            # player 2 input
-            else:
-                if event.key == py.K_0:
-                    col = 0
-                elif event.key == py.K_1:
-                    col = 1
-                elif event.key == py.K_2:
-                    col = 2
-                elif event.key == py.K_3:
-                    col = 3
-                elif event.key == py.K_4:
-                    col = 4
-                elif event.key == py.K_5:
-                    col = 5
-                elif event.key == py.K_6:
-                    col = 6
+    # player 2 input
+    else:
+        col = ai_move()
 
-                if valid_location(game_board, col):
-                    row = next_open_row(game_board, col)
-                    place_player(game_board, row, col, 2)
+        if valid_location(game_board, col):
+            row = next_open_row(game_board, col)
+            place_player(game_board, row, col, 2)
 
-                    if winning_move(game_board, 2):
-                        game = False
+            if winning_move(game_board, 2):
+                game = False
 
-            draw_game_board(game_board)
+    draw_game_board(game_board)
 
-            turn += 1
-            turn = turn % 2
+    turn += 1
+    turn = turn % 2
 
-            if not game:
-                py.time.wait(2000)
+    if not game:
+        py.time.wait(2000)
