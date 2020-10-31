@@ -2,11 +2,12 @@ import numpy as np
 import pygame as py
 import sys
 import math
+from random import randint
 
-BLUE = (0,0,255)
+BLUE = (51,153,255)
 BLACK = (0,0,0)
-RED = (255,0,0)
-YELLOW = (255,255,0)
+RED = (204,0,102)
+YELLOW = (255,255,102)
 
 ROW = 6
 COLUMN = 7
@@ -15,12 +16,12 @@ RADIUS = int(SIZE/2 - 5)
 
 WIDTH = COLUMN * SIZE
 HEIGHT = (ROW+1) * SIZE
-size = (WIDTH, HEIGHT)
+SCREEN_SIZE = (WIDTH, HEIGHT)
 
 
 # helpers
 def initialize_game():
-	game = np.zeros((ROW,COLUMN))
+	game = np.zeros((ROW,COLUMN), dtype=int)
 	return game
 
 def place_player(game_board, row, col, player):
@@ -34,10 +35,31 @@ def next_open_row(game_board, col):
 		if game_board[row][col] == 0:
 			return row
 
+
+# controler helpers
 # ai moves
 def ai_move():
     col = int(input("Enter a column number: "))
     return col
+# random move
+def random_move(game_board):
+    col = randint(0, 6)
+    while not valid_location(game_board, col):
+        col = randint(0, 6)
+    return col
+# function to update outcomes
+def stats(history, winner, turns):
+    return history, winner, turn
+
+
+
+# game states
+# is draw, basic
+def check_draw(game_board):
+    if 0 not in game_board:
+        return True
+    else:
+        return False
 
 def winning_move(game_board, player):
 	# Check horizontal locations for win
@@ -76,7 +98,7 @@ def winning_move(game_board, player):
                 game_board[r-3][c+3] == player):
 				return True
 
-def draw_game_board(game_board):
+def draw_game_board(game_board, screen):
 	for c in range(COLUMN):
 		for r in range(ROW):
 			py.draw.rect(screen, BLUE, (c*SIZE, r*SIZE+SIZE, SIZE, SIZE))
@@ -91,55 +113,89 @@ def draw_game_board(game_board):
 	py.display.update()
 
 
-# initialize vars
-game_board = initialize_game()
-game = True
-turn = 0
-py.init()
-screen = py.display.set_mode(size)
-draw_game_board(game_board)
-py.display.update()
-# main game loop
-while game:
-    
-    # check for key events
-    '''for event in py.event.get():
-        if event.type == py.QUIT:
-            sys.exit()'''
 
 
-    print(game_board)
+# driver code for game
+def game(player1_name="Red", player2_name="Blue", method='random'):
+    # initialize vars
+    game_board = initialize_game()
+    game = True
+    turn = 0
+    py.init()
+    screen = py.display.set_mode(SCREEN_SIZE)
+    draw_game_board(game_board, screen)
+    py.display.update()
+    # gane states
+    history = []
+    winner = None
+    turns = 0
+    # main game loop
+    while game:
+        
+        # check for key events
+        '''for event in py.event.get():
+            if event.type == py.QUIT:
+                sys.exit()'''
+
+
+        print(game_board)
+        #timer to pause ai or random between turns
+        #py.time.wait(100)
+
+                
+        py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
             
-    py.draw.rect(screen, BLACK, (0,0, WIDTH, SIZE))
         
-     # Ask for Player 1 Input
-    if turn == 0:
-        
-        col = ai_move()
+        if turn == 0:
+            # ai or random move
+            if method == 'random':
+                col = random_move(game_board)
+            else:
+                col = ai_move()
 
-        if valid_location(game_board, col):
-            row = next_open_row(game_board, col)
-            place_player(game_board, row, col, 1)
+            if valid_location(game_board, col):
+                row = next_open_row(game_board, col)
+                place_player(game_board, row, col, 1)
+                
+                if winning_move(game_board, 1):
+                    draw_game_board(game_board, screen)
+                    winner = player1_name
+                    turns+= 1
+                    history.append(game_board)
+                    game = False
+      
+        else:
+            # ai or random move
+            if method == 'random':
+                col = random_move(game_board)
+            else:
+                col = ai_move()
 
-            if winning_move(game_board, 1):
-                game = False
+            if valid_location(game_board, col):
+                row = next_open_row(game_board, col)
+                place_player(game_board, row, col, 2)
 
+                if winning_move(game_board, 2):
+                    draw_game_board(game_board, screen)
+                    winner = player2_name
+                    turns+= 1
+                    history.append(game_board)
+                    game = False
+        #update game with moves
+        draw_game_board(game_board, screen)
+        history.append(game_board)
+        #check draw
+        if check_draw(game_board):
+            game = False
+            winner = None
+        # collect turn data
+        turns+= 1
+        turn += 1
+        turn = turn % 2
 
-    # player 2 input
-    else:
-        col = ai_move()
+        if not game:
+            py.time.wait(500)
 
-        if valid_location(game_board, col):
-            row = next_open_row(game_board, col)
-            place_player(game_board, row, col, 2)
-
-            if winning_move(game_board, 2):
-                game = False
-
-    draw_game_board(game_board)
-
-    turn += 1
-    turn = turn % 2
-
-    if not game:
-        py.time.wait(2000)
+    # return outcomes
+    #stats(history, winner, turns)
+    return history, winner, turns
