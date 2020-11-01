@@ -116,19 +116,24 @@ def draw_game_board(game_board, screen):
 
 
 # driver code for game
-def game(player1_name="Red", player2_name="Blue", method='random'):
+def game(player1_name="Red", player2_name="Blue", method='random', display=None):
     # initialize vars
     game_board = initialize_game()
     game = True
     turn = 0
-    py.init()
-    screen = py.display.set_mode(SCREEN_SIZE)
-    draw_game_board(game_board, screen)
-    py.display.update()
-    # gane states
+    turns = 0
     history = []
     winner = None
-    turns = 0
+    
+    
+    # Select if we should diplay the game
+    if display is not None:
+        py.init()
+        screen = py.display.set_mode(SCREEN_SIZE)
+        draw_game_board(game_board, screen)
+        py.display.update()
+
+
     # main game loop
     while game:
         
@@ -138,12 +143,14 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
                 sys.exit()'''
 
 
-        print(game_board)
+        
         #timer to pause ai or random between turns
-        #py.time.wait(100)
+        # py.time.wait(100)
+        print(game_board)
+        
 
-                
-        py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
+        if display is not None:
+            py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
             
         
         if turn == 0:
@@ -158,10 +165,13 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
                 place_player(game_board, row, col, 1)
                 
                 if winning_move(game_board, 1):
-                    draw_game_board(game_board, screen)
+                    
+                    print(game_board)
                     winner = player1_name
                     turns+= 1
                     history.append(game_board)
+                    if display is not None:
+                        draw_game_board(game_board, screen)
                     game = False
       
         else:
@@ -176,19 +186,23 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
                 place_player(game_board, row, col, 2)
 
                 if winning_move(game_board, 2):
-                    draw_game_board(game_board, screen)
+
+                    print(game_board)
                     winner = player2_name
                     turns+= 1
                     history.append(game_board)
+                    if display is not None:
+                        draw_game_board(game_board, screen)
                     game = False
         #update game with moves
-        draw_game_board(game_board, screen)
+        if display is not None:
+            draw_game_board(game_board, screen)
         history.append(game_board)
         #check draw
         if check_draw(game_board):
             game = False
             winner = None
-        # collect turn data
+        # update vars
         turns+= 1
         turn += 1
         turn = turn % 2
@@ -196,6 +210,6 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
         if not game:
             py.time.wait(500)
 
-    # return outcomes
-    #stats(history, winner, turns)
+    # return outcomes 
     return history, winner, turns
+
