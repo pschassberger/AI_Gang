@@ -4,10 +4,10 @@ import sys
 import math
 from random import randint
 
-BLUE = (51, 153, 255)
-BLACK = (0, 0, 0)
-RED = (204, 0, 102)
-YELLOW = (255, 255, 102)
+BLUE = (51,153,255)
+BLACK = (0,0,0)
+RED = (204,0,102)
+YELLOW = (255,255,102)
 
 ROW = 6
 COLUMN = 7
@@ -15,7 +15,7 @@ SIZE = 100
 RADIUS = int(SIZE / 2 - 5)
 
 WIDTH = COLUMN * SIZE
-HEIGHT = (ROW + 1) * SIZE
+HEIGHT = (ROW+1) * SIZE
 SCREEN_SIZE = (WIDTH, HEIGHT)
 
 
@@ -23,7 +23,6 @@ SCREEN_SIZE = (WIDTH, HEIGHT)
 def initialize_game():
     game = np.zeros((ROW, COLUMN), dtype=int)
     return game
-
 
 def place_player(game_board, row, col, player):
     game_board[row][col] = player
@@ -54,6 +53,19 @@ def random_move(game_board):
     while not valid_location(game_board, col):
         col = randint(0, 6)
     return col
+
+# function to update outcomes
+def stats(history, winner, turns):
+    return history, winner, turns
+
+
+# game states
+# is draw, basic
+def check_draw(game_board):
+    if 0 not in game_board:
+        return True
+    else:
+        return False
 
 
 # function to update outcomes
@@ -145,7 +157,7 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
 
         print(np.flip(game_board, 0))
         # timer to pause ai or random between turns
-        py.time.wait(1000)
+        py.time.wait(100)
 
         py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
 
@@ -202,5 +214,6 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
     # return outcomes
     # stats(history, winner, turns)
     return history, winner, turns
+
 
 game("Red", "Blue", 'random')
