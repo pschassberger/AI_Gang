@@ -2,6 +2,7 @@
 import numpy as np
 from game import*
 from NN import*
+import pandas as pd
 
 # save numpy array as csv file
 from numpy import asarray
@@ -12,7 +13,7 @@ from numpy import savetxt
 
 # game interface and player control
 # def number of games to play
-def play_games(num_of_sims=100):
+def play_games(num_of_sims=3):
     # data to collect
     total_history = []
     red_winner = []
@@ -24,6 +25,8 @@ def play_games(num_of_sims=100):
                 "Blue"  :   0, 
                 "Draw"  :   0
     }
+
+    
 
     for i in range(num_of_sims):
         history=[]
@@ -39,12 +42,22 @@ def play_games(num_of_sims=100):
             blue_winner.append(winner)
         else:
             draws.append(winner)
+        
+   
+    
+    df = pd.DataFrame(total_history)
+    
+    df.to_csv('data.csv',index=False, header=False)
+
 
     outcome.update(Red = len(red_winner) / num_of_sims)
     outcome.update(Blue = len(blue_winner) / num_of_sims)
     outcome.update(Draw = len(draws) / num_of_sims)
-    print(outcome)
-        
+    
+
+
+    
+    
+       
 
 play_games()
-
