@@ -4,10 +4,10 @@ import sys
 import math
 from random import randint
 
-BLUE = (51,153,255)
-BLACK = (0,0,0)
-RED = (204,0,102)
-YELLOW = (255,255,102)
+BLUE = (51, 153, 255)
+BLACK = (0, 0, 0)
+RED = (204, 0, 102)
+YELLOW = (255, 255, 102)
 
 ROW = 6
 COLUMN = 7
@@ -15,7 +15,7 @@ SIZE = 100
 RADIUS = int(SIZE / 2 - 5)
 
 WIDTH = COLUMN * SIZE
-HEIGHT = (ROW+1) * SIZE
+HEIGHT = (ROW + 1) * SIZE
 SCREEN_SIZE = (WIDTH, HEIGHT)
 
 
@@ -23,6 +23,7 @@ SCREEN_SIZE = (WIDTH, HEIGHT)
 def initialize_game():
     game = np.zeros((ROW, COLUMN), dtype=int)
     return game
+
 
 def place_player(game_board, row, col, player):
     game_board[row][col] = player
@@ -41,10 +42,14 @@ def next_open_row(game_board, col):
 # controler helpers
 # ai moves
 def ai_move():
-    col = -1
-    while col < 0 or col >= COLUMN:
-        col = int(input("Enter a valid column number: "))
+    col = int(input("Enter a column number: "))
     return col
+
+
+def place_chip(board, col, player):
+    row = next_open_row(board, col)
+    board[row][col] = player
+    return board
 
 
 # random move
@@ -53,19 +58,6 @@ def random_move(game_board):
     while not valid_location(game_board, col):
         col = randint(0, 6)
     return col
-
-# function to update outcomes
-def stats(history, winner, turns):
-    return history, winner, turns
-
-
-# game states
-# is draw, basic
-def check_draw(game_board):
-    if 0 not in game_board:
-        return True
-    else:
-        return False
 
 
 # function to update outcomes
@@ -135,36 +127,128 @@ def draw_game_board(game_board, screen):
     py.display.update()
 
 
+def find_longest_run(new_board, player):
+    horizontal_longest = 0
+    vertical_longest = 0
+    positive_longest = 0
+    negative_longest = 0
+
+    # Check longest horizontal streak
+    for c in range(COLUMN - 3):
+        for r in range(ROW):
+            local_longest = 1
+            if new_board[r][c] == player:
+                local_longest += 1
+                if new_board[r][c + 1] == player:
+                    local_longest += 1
+                    if new_board[r][c + 2] == player:
+                        local_longest += 1
+                        if new_board[r][c + 3] == player:
+                            local_longest += 1
+            if local_longest > horizontal_longest:
+                horizontal_longest = local_longest
+
+    for c in range(COLUMN):
+        for r in range(ROW - 3):
+            local_longest = 1
+            if new_board[r][c] == player:
+                local_longest += 1
+                if new_board[r + 1][c] == player:
+                    local_longest += 1
+                    if new_board[r + 2][c] == player:
+                        local_longest += 1
+                        if new_board[r + 3][c] == player:
+                            local_longest += 1
+            if local_longest > vertical_longest:
+                vertical_longest = local_longest
+
+    for c in range(COLUMN - 3):
+        for r in range(ROW - 3):
+            local_longest = 1
+            if new_board[r][c] == player:
+                local_longest += 1
+                if new_board[r + 1][c + 1] == player:
+                    local_longest += 1
+                    if new_board[r + 2][c + 2] == player:
+                        local_longest += 1
+                        if new_board[r + 3][c + 3] == player:
+                            local_longest += 1
+            if local_longest > positive_longest:
+                positive_longest = local_longest
+
+    for c in range(COLUMN - 3):
+        for r in range(3, ROW):
+            local_longest = 1
+            if new_board[r][c] == player:
+                local_longest += 1
+                if new_board[r - 1][c + 1] == player:
+                    local_longest += 1
+                    if new_board[r - 2][c + 2] == player:
+                        local_longest += 1
+                        if new_board[r - 3][c + 3] == player:
+                            local_longest += 1
+            if local_longest > negative_longest:
+                negative_longest = local_longest
+
+    return max(horizontal_longest, vertical_longest, positive_longest, negative_longest)
+
+
+def longest_run(curr_board, player):
+    longest = [0, 0, 0, 0, 0, 0, 0]
+    for col in range(0, COLUMN):
+        if curr_board[ROW-1][col] == 0:
+            new_board = place_chip(curr_board.copy(), col, player)
+            longest[col] = find_longest_run(new_board.copy(), player)
+
+    max_run = max(longest)
+    possible_cols = []
+    for i in range(len(longest)):
+        if i == max_run:
+            possible_cols.append(i)
+
+    return possible_cols[randint(0, len(possible_cols)-1)]
+
+
 # driver code for game
-def game(player1_name="Red", player2_name="Blue", method='random'):
+def game(player1_name="Red", player2_name="Blue", method1='longest_run', method2='random', display=None):
     # initialize vars
     game_board = initialize_game()
     game = True
     turn = 0
-    py.init()
-    screen = py.display.set_mode(SCREEN_SIZE)
-    draw_game_board(game_board, screen)
-    py.display.update()
-    # gane states
+    turns = 0
     history = []
     winner = None
-    turns = 0
+
+    # Select if we should diplay the game
+    if display is not None:
+        py.init()
+        screen = py.display.set_mode(SCREEN_SIZE)
+        draw_game_board(game_board, screen)
+        py.display.update()
+
     # main game loop
     while game:
 
+        history.append(game_board.copy())
+
         # check for key events
-        py.event.get()
+        '''for event in py.event.get():
+            if event.type == py.QUIT:
+                sys.exit()'''
 
-        print(np.flip(game_board, 0))
         # timer to pause ai or random between turns
-        py.time.wait(100)
+        # py.time.wait(100)
+        print(np.flip(game_board,0))
 
-        py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
+        if display is not None:
+            py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
 
         if turn == 0:
             # ai or random move
-            if method == 'random':
+            if method1 == 'random':
                 col = random_move(game_board)
+            elif method1 == 'longest_run':
+                col = longest_run(game_board.copy(), 1)
             else:
                 col = ai_move()
 
@@ -173,16 +257,21 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
                 place_player(game_board, row, col, 1)
 
                 if winning_move(game_board, 1):
-                    draw_game_board(game_board, screen)
+
+                    print(np.flip(game_board,0))
                     winner = player1_name
                     turns += 1
-                    history.append(game_board)
+                    history.append(game_board.copy())
+                    if display is not None:
+                        draw_game_board(game_board, screen)
                     game = False
 
         else:
             # ai or random move
-            if method == 'random':
+            if method2 == 'random':
                 col = random_move(game_board)
+            elif method2 == 'longest_run':
+                col = longest_run(game_board, 2)
             else:
                 col = ai_move()
 
@@ -191,29 +280,32 @@ def game(player1_name="Red", player2_name="Blue", method='random'):
                 place_player(game_board, row, col, 2)
 
                 if winning_move(game_board, 2):
-                    draw_game_board(game_board, screen)
+
+                    print(np.flip(game_board, 0))
                     winner = player2_name
                     turns += 1
-                    history.append(game_board)
+                    history.append(game_board.copy())
+                    if display is not None:
+                        draw_game_board(game_board, screen)
                     game = False
         # update game with moves
-        draw_game_board(game_board, screen)
-        history.append(game_board)
+        if display is not None:
+            draw_game_board(game_board, screen)
+
         # check draw
         if check_draw(game_board):
+            history.append(game_board.copy())
             game = False
             winner = None
-        # collect turn data
+        # update vars
         turns += 1
         turn += 1
         turn = turn % 2
 
         if not game:
-            py.time.wait(5000)
+            py.time.wait(500)
 
     # return outcomes
-    # stats(history, winner, turns)
     return history, winner, turns
 
 
-game("Red", "Blue", 'random')
