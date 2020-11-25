@@ -36,22 +36,54 @@ def next_open_row(game_board, col):
 		if game_board[row][col] == 0:
 			return row
 
+# translate matrix into list
+def get_states(game_board):
+    my_states = []
+    for r in range(ROW):
+        for c in range(COLUMN):
+            my_states.append(game_board[r][c])
+    return my_states
+
 
 # controler helpers
 # ai moves
 def ai_move():
     col = int(input("Enter a column number: "))
     return col
+
+
 # random move
 def random_move(game_board):
     col = randint(0, 6)
     while not valid_location(game_board, col):
         col = randint(0, 6)
     return col
-# function to update outcomes
-def stats(history, winner, turns):
-    return history, winner, turn
+def smart_move(game_board):
+    
 
+# function tur game state into a binary vector
+def to_binary(game_state_list):
+    binary_vector = []
+    for i in game_state_list:
+        if i == 0:
+            binary_vector.append([1,0,0])
+        elif i == 1:
+            binary_vector.append([0,1,0])
+        else:
+            binary_vector.append([0,0,1])
+
+    binary_vector = np.array(binary_vector)
+    return binary_vector.flatten()
+
+# append win or lose to record
+def score_stats(game_binary, winner):
+    binary_wins = []
+    for game in range(len(game_binary)):
+        if winner == 1:
+            binary_wins.append(np.concatenate((game_binary[game], [1,0])))
+        elif winner == 2:
+            binary_wins.append(np.concatenate((game_binary[game], [0,1])))
+    return binary_wins
 
 
 # game states
@@ -123,8 +155,10 @@ def game(player1_name="Red", player2_name="Blue", method='random', display=None)
     game = True
     turn = 0
     turns = 0
-    history = []
     winner = None
+    draw = None
+    history = []
+    binary_game = []
     
     
     # Select if we should diplay the game
@@ -138,21 +172,11 @@ def game(player1_name="Red", player2_name="Blue", method='random', display=None)
     # main game loop
     while game:
 
-        history.append(game_board.copy())
+        history.append(to_binary(get_states(game_board.copy())))
 
-        
-        # check for key events
-        '''for event in py.event.get():
-            if event.type == py.QUIT:
-                sys.exit()'''
-
-
-        
         #timer to pause ai or random between turns
         # py.time.wait(100)
-        print(game_board)
-       
-        
+        #print(game_board)   
 
         if display is not None:
             py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
@@ -172,10 +196,11 @@ def game(player1_name="Red", player2_name="Blue", method='random', display=None)
                 
                 if winning_move(game_board, 1):
                     
-                    print(game_board)
-                    winner = player1_name
+                    #print(game_board)
+                    winner = 1
                     turns+= 1
-                    history.append(game_board.copy())
+                    #history.append(to_binary(get_states(game_board.copy())))
+                    binary_game = score_stats(history, 1)
                     if display is not None:
                         draw_game_board(game_board, screen)
                     game = False
@@ -194,10 +219,11 @@ def game(player1_name="Red", player2_name="Blue", method='random', display=None)
 
                 if winning_move(game_board, 2):
 
-                    print(game_board)
-                    winner = player2_name
+                    #print(game_board)
+                    winner = 2
                     turns+= 1
-                    history.append(game_board.copy())
+                    #history.append(to_binary(get_states(game_board.copy())))
+                    binary_game = score_stats(history, 2)
                     if display is not None:
                         draw_game_board(game_board, screen)
                     game = False
@@ -207,17 +233,29 @@ def game(player1_name="Red", player2_name="Blue", method='random', display=None)
         
         #check draw
         if check_draw(game_board):
-            history.append(game_board.copy())
+            history.append(to_binary(get_states(game_board.copy())))
             game = False
             winner = None
+            draw = True
         # update vars
         turns+= 1
         turn += 1
         turn = turn % 2
+
+        # append win probabilitiea
         
 
         if not game:
             py.time.wait(500)
 
     # return outcomes
-    return history, winner, turns
+    if draw:
+        pass
+    else:
+        return binary_game
+
+'''    print(binary_game)
+    
+
+for i in range(100):
+    game()'''
