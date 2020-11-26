@@ -9,7 +9,7 @@ import tensorflow.keras as keras
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Softmax, Dropout
 
-
+from game import valid_location, next_open_row, to_binary, get_states, place_player
 
 
 # Import data in a 80/20 train test split
@@ -22,7 +22,7 @@ training_data = training_data.drop(["Player_1 Wins", "Player_2 Wins"], axis=1)
 features = np.array(training_data.drop(["Player_1_Win_Percent","Player_2_Win_Percent"], axis=1))
 labels = np.array(training_data.drop([str(x+1) for x in range(126)], axis=1))
 #split
-X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
 
 print(X_train.shape)
 
@@ -30,26 +30,22 @@ print(X_train.shape)
 def model():
     layers = []
     layers.append(Dense(126, activation='relu', input_shape=(126,)))
-    layers.append(Dropout(0.05))
-    layers.append(Dense(126, activation='relu'))
-    layers.append(Dropout(0.05))
+    layers.append(Dropout(0.2))
+    layers.append(Dense(100, activation='tanh'))
+    layers.append(Dropout(0.2))
     layers.append(Dense(2,  activation='softmax'))
 
-    model = keras.Sequential(layers=layers)
+    model = Sequential(layers=layers)
+    model.compile(optimizer="adam", loss="KLDivergence", metrics="mse", loss_weights=None, weighted_metrics=None, run_eagerly=None)
 
     return model
 
-
+# load, train, save model
 model = model()
-
-#compile model
-model.compile(optimizer="adam", loss="KLDivergence", metrics="mse", loss_weights=None,
-    weighted_metrics=None, run_eagerly=None)
-
 #fit model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=500)
+model.fit(X_train, y_train, epochs=100, validation_data=(X_test, y_test))
+#model.save('c4_model')
 
 model.summary()
 
-
-
+model.evaluate(X_test, y_test)

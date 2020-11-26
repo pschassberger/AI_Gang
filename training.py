@@ -1,11 +1,13 @@
 # pull it all together
 import numpy as np
 from game import*
-from NN import*
 import pandas as pd
 import csv
 # define data
-
+"""
+Create training data for NN, set method of player and number of simulations.
+Data will be stored and manipulated in a dataframe and save it to a csv
+"""
 #helper functions
 def clean_data(df_games):
     # create df based on only volumns to id repeats
