@@ -15,7 +15,7 @@ from game import valid_location, next_open_row, to_binary, get_states, place_pla
 
 # Import data in a 80/20 train test split
 # import into df
-data = pd.read_csv("data_c4.csv", index_col=False)
+data = pd.read_csv("big_data_c4.csv", index_col=False)
 #print(data.head())
 training_data = data.copy()
 training_data = training_data.drop(["Player_1 Wins", "Player_2 Wins"], axis=1)
@@ -32,9 +32,9 @@ def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
     layers = []
     layers.append(Dense(126, activation='relu', input_shape=(126,)))
     layers.append(Dropout(0.2))
-    layers.append(Dense(252, activation='relu'))
+    layers.append(Dense(256, activation='relu'))
     layers.append(Dropout(0.2))
-    layers.append(Dense(126, activation='relu'))
+    layers.append(Dense(100, activation='relu'))
     layers.append(Dropout(0.2))
     layers.append(Dense(2,  activation='softmax'))
 
@@ -47,10 +47,10 @@ def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
 
 model = model()
 #fit model
-model.fit(X_train, y_train, epochs=160, validation_data=(X_test, y_test), verbose=0)
+model.fit(X_train, y_train, epochs=160, validation_data=(X_test, y_test))
 model.summary()
 model.evaluate(X_test, y_test)
 
 #save model
-model.save('c4_model')
+model.save('c4_model_l')
 

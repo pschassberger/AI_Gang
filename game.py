@@ -52,11 +52,6 @@ def get_states(game_board):
             my_states.append(game_board[r][c])
     return my_states
 
-
-'''# controler helpers
-def model_load(model='c4_model'):
-    my_model = keras.models.load_model(model)
-    return my_model'''
 # ai moves
 def ai_move(game_board, my_model, player):
     possible_moves = []

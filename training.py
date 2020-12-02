@@ -49,7 +49,7 @@ def check(df_games):
     
 # game interface and player control
 # def number of games to play
-def play_games(num_of_sims=1000):
+def play_games(num_of_sims=10000):
     # data to collect
     total_history = []
 
@@ -67,7 +67,7 @@ def play_games(num_of_sims=1000):
     data = clean_data(training_data)
     check(data)
     # save training data to csv
-    data.to_csv('data_c4.csv')
+    data.to_csv('big_data_c4.csv')
     
 
 play_games()
