@@ -9,9 +9,10 @@ from numpy import asarray
 from numpy import savetxt
 # define data
 
+
 # game interface and player control
 # def number of games to play
-def play_games(num_of_sims=100):
+def play_games(num_of_sims=300):
     # data to collect
     total_history = []
     red_winner = []
