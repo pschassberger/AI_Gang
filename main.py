@@ -14,7 +14,7 @@ from game import game
 Main interface for interacting with the game and agent.
 """
 #simulate a given amount of games with AI, player or random
-def sim(number_sims=5):
+def sim(number_sims=100):
     my_model = keras.models.load_model('c4_model')
 
     score_board = { "Player 1" : 0, 

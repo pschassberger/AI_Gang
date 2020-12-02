@@ -56,7 +56,7 @@ def play_games(num_of_sims=1000):
     for i in range(num_of_sims):
         history=[]
         # call game for data collection
-        history = game(player1_name="Red", player2_name="Blue", method='random', display=None)
+        history = game(player1_name="Red", player2_name="Blue", method_1="random", method_2="random", model=None, display=False, training=True)
         total_history += history
 
 
@@ -65,9 +65,9 @@ def play_games(num_of_sims=1000):
     training_data.columns = [x+1 for x in range(126)] + ["Player_1 Wins", "Player_2 Wins"]
     # clean data
     data = clean_data(training_data)
-    #check(data)
+    check(data)
     # save training data to csv
-    data.to_csv('training_data_c4.csv')
+    data.to_csv('data_c4.csv')
     
 
 play_games()

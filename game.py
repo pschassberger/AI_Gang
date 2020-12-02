@@ -175,94 +175,6 @@ def draw_game_board(game_board, screen):
 				py.draw.circle(screen, YELLOW, (int(c*SIZE+SIZE/2), HEIGHT-int(r*SIZE+SIZE/2)), RADIUS)
 	py.display.update()
 
-#longest
-def place_chip(board, col, player):
-    row = next_open_row(board, col)
-    board[row][col] = player
-    return board
-#longest run
-def find_longest_run(new_board, player):
-    horizontal_longest = 0
-    vertical_longest = 0
-    positive_longest = 0
-    negative_longest = 0
-
-    # Check longest horizontal streak
-    for c in range(COLUMN - 3):
-        for r in range(ROW):
-            local_longest = 1
-            if new_board[r][c] == player:
-                local_longest += 1
-                if new_board[r][c + 1] == player:
-                    local_longest += 1
-                    if new_board[r][c + 2] == player:
-                        local_longest += 1
-                        if new_board[r][c + 3] == player:
-                            local_longest += 1
-            if local_longest > horizontal_longest:
-                horizontal_longest = local_longest
-
-    for c in range(COLUMN):
-        for r in range(ROW - 3):
-            local_longest = 1
-            if new_board[r][c] == player:
-                local_longest += 1
-                if new_board[r + 1][c] == player:
-                    local_longest += 1
-                    if new_board[r + 2][c] == player:
-                        local_longest += 1
-                        if new_board[r + 3][c] == player:
-                            local_longest += 1
-            if local_longest > vertical_longest:
-                vertical_longest = local_longest
-
-    for c in range(COLUMN - 3):
-        for r in range(ROW - 3):
-            local_longest = 1
-            if new_board[r][c] == player:
-                local_longest += 1
-                if new_board[r + 1][c + 1] == player:
-                    local_longest += 1
-                    if new_board[r + 2][c + 2] == player:
-                        local_longest += 1
-                        if new_board[r + 3][c + 3] == player:
-                            local_longest += 1
-            if local_longest > positive_longest:
-                positive_longest = local_longest
-
-    for c in range(COLUMN - 3):
-        for r in range(3, ROW):
-            local_longest = 1
-            if new_board[r][c] == player:
-                local_longest += 1
-                if new_board[r - 1][c + 1] == player:
-                    local_longest += 1
-                    if new_board[r - 2][c + 2] == player:
-                        local_longest += 1
-                        if new_board[r - 3][c + 3] == player:
-                            local_longest += 1
-            if local_longest > negative_longest:
-                negative_longest = local_longest
-
-    return max(horizontal_longest, vertical_longest, positive_longest, negative_longest)
-
-
-def longest_run(curr_board, player):
-    longest = [0, 0, 0, 0, 0, 0, 0]
-    for col in range(0, COLUMN):
-        if curr_board[ROW-1][col] == 0:
-            new_board = place_chip(curr_board.copy(), col, player)
-            longest[col] = find_longest_run(new_board.copy(), player)
-
-    max_run = max(longest)
-    possible_cols = []
-    for i in range(len(longest)):
-        if i == max_run:
-            possible_cols.append(i)
-
-    return possible_cols[randint(0, len(possible_cols)-1)]
-
-
 
 # driver code for game
 def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, model=None, display=False, training=False):
@@ -278,7 +190,7 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
     
     
     # Select if we should diplay the game
-    if display is not False:
+    if display is True:
         py.init()
         screen = py.display.set_mode(SCREEN_SIZE)
         draw_game_board(game_board, screen)
@@ -291,10 +203,11 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         history.append(to_binary(get_states(game_board.copy())))
 
         #timer to pause ai or random between turns
-        # py.time.wait(100)
+        #py.time.wait(100)
         #print(game_board)   
 
         if display is True:
+            py.time.wait(100)
             py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
             
         
@@ -360,8 +273,8 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         turns+= 1
         turn += 1
         turn = turn % 2
-        if not game:
-            py.time.wait(500)
+        '''if not game:
+            py.time.wait(500)'''
 
     # return outcomes
     if training:
