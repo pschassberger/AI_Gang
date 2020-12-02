@@ -32,7 +32,9 @@ def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
     layers = []
     layers.append(Dense(126, activation='relu', input_shape=(126,)))
     layers.append(Dropout(0.2))
-    layers.append(Dense(126, activation='tanh'))
+    layers.append(Dense(252, activation='relu'))
+    layers.append(Dropout(0.2))
+    layers.append(Dense(126, activation='relu'))
     layers.append(Dropout(0.2))
     layers.append(Dense(2,  activation='softmax'))
 

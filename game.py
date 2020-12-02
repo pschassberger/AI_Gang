@@ -53,10 +53,10 @@ def get_states(game_board):
     return my_states
 
 
-# controler helpers
+'''# controler helpers
 def model_load(model='c4_model'):
     my_model = keras.models.load_model(model)
-    return my_model
+    return my_model'''
 # ai moves
 def ai_move(game_board, my_model, player):
     possible_moves = []
@@ -66,8 +66,7 @@ def ai_move(game_board, my_model, player):
             row = next_open_row(dummy, move)
             place_player(dummy, row, move, player)
             possible_moves.append(to_binary(get_states(dummy)))       
-    #load model
-    #my_model = keras.models.load_model('c4_model')
+    #make predictions
     predictions = my_model.predict(np.array(possible_moves), batch_size=7)
     K.clear_session()
     #get highest prediction move

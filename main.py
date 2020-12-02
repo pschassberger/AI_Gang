@@ -14,13 +14,13 @@ from game import game
 Main interface for interacting with the game and agent.
 """
 #simulate a given amount of games with AI, player or random
-def sim(number_sims=100):
+def sim(number_sims=50):
     my_model = keras.models.load_model('c4_model')
 
     score_board = { "Player 1" : 0, 
                     "Player 2" : 0}
     for i in range(number_sims):
-        winner = game(method_1="AI", method_2="AI", model=my_model, display=True)
+        winner = game(method_1="AI", method_2="random", model=my_model, display=False)
         if winner == 1:
             score_board["Player 1"] += 1
         else:
