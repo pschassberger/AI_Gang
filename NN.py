@@ -1,45 +1,50 @@
-'''
-# build basic model
+from sklearn.model_selection import train_test_split, GridSearchCV
 import numpy as np
 import pandas as pd
-import csv
-
 import tensorflow as tf
 import tensorflow.keras as keras
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from keras.utils import to_categorical
+from tensorflow.keras.layers import Dense, Softmax, Dropout
+from keras.wrappers.scikit_learn import KerasRegressor
 
-file = open('data.csv')
-data = csv.reader(file)
-
-data = list(data)
-training_data = np.array(data)
-
-# find size of batch
-size = training_data.shape
-batch_size = size[1]
-
-inputi = []
-output = []
-for dat in data:
-    inputi.append(dat[1])
-    output.append(dat[0])
-
-X = np.array(data).reshape((-1, batch_size))
-y = [0, 1, 2]
-limit = int(0.8 * len(X))
-X_train = X[:limit]
-X_test = X[limit:]
-
-print(X_train)
+from game import valid_location, next_open_row, to_binary, get_states, place_player
 
 
-def nn_model(batch_size):
-    layers = [Dense(42, activation='relu', input_shape=(42,)),
-              Dense(42, activation='relu'),
-              Dense(7, activation='softmax')]
+# Import data in a 80/20 train test split
+# import into df
+data = pd.read_csv("data_c4.csv", index_col=False)
+#print(data.head())
+training_data = data.copy()
+training_data = training_data.drop(["Player_1 Wins", "Player_2 Wins"], axis=1)
+#split into labels and targets
+features = np.array(training_data.drop(["Player_1_Win_Percent","Player_2_Win_Percent"], axis=1))
+labels = np.array(training_data.drop([str(x+1) for x in range(126)], axis=1))
+#split
+X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
 
-    model = keras.Sequential(layers)
-    model.compile(loss='categorical_crossentropy', optimizer="rmsprop", metrics=['accuracy'])
-'''
+print(X_train.shape)
+
+#define model params
+def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
+    layers = []
+    layers.append(Dense(126, activation='relu', input_shape=(126,)))
+    layers.append(Dropout(0.2))
+    layers.append(Dense(126, activation='tanh'))
+    layers.append(Dropout(0.2))
+    layers.append(Dense(2,  activation='softmax'))
+
+    model = Sequential(layers=layers)
+    model.compile(optimizer=optimizer, loss=loss, metrics=metrics, loss_weights=None, weighted_metrics=None, run_eagerly=None)
+
+    return model
+
+# load, train, save model
+
+model = model()
+#fit model
+model.fit(X_train, y_train, epochs=160, validation_data=(X_test, y_test), verbose=0)
+model.summary()
+model.evaluate(X_test, y_test)
+
+#save model
+model.save('c4_model')
