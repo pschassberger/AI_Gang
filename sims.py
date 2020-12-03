@@ -11,9 +11,10 @@ from game import game
 
 
 """
-Main interface for interacting with the game and agent.
+Main interface for simulating the game and agent.
 Simulates games with AI, player and random play options
 Loads model specified in def sim
+Prints number of wins, specify number_sims
 
 """
 #simulate a given amount of games with AI, player or random

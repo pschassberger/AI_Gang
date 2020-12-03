@@ -13,3 +13,10 @@ Game Interface:
 Model:
     Our model is a 5 layer keras model, utilizing Dense layers followed by dropout layers to prevent over fitting. Various hyperparamters have been tested and we have 
     settled on the parameters outlined in NN.py.
+
+
+How to Play:
+
+    Run main.py for a player vs AI game, it will prompt until the user terminates the game.
+    All other .py files are for training and simulating, each file has methods outlined
+    Models are saved to file, c4_model, c4_model_l

@@ -9,11 +9,22 @@ import tensorflow.keras as keras
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Softmax, Dropout
 from keras.wrappers.scikit_learn import KerasRegressor
+from tensorflow.keras.callbacks import TensorBoard
+import datetime
 
 from game import valid_location, next_open_row, to_binary, get_states, place_player
 
+"""
+Space to build and train mode. 
+Pulls data into dataframe and splits into train test.
+Model can be adjusted in function
+2 Models are saved c4_model, c4_model_l
+2 datasets data_c4, big_data_c4
 
-# Import data in a 80/20 train test split
+"""
+
+
+'''# Import data in a 80/20 train test split
 # import into df
 data = pd.read_csv("big_data_c4.csv", index_col=False)
 #print(data.head())
@@ -34,7 +45,7 @@ def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
     layers.append(Dropout(0.2))
     layers.append(Dense(256, activation='relu'))
     layers.append(Dropout(0.2))
-    layers.append(Dense(100, activation='relu'))
+    layers.append(Dense(126, activation='relu'))
     layers.append(Dropout(0.2))
     layers.append(Dense(2,  activation='softmax'))
 
@@ -44,13 +55,18 @@ def model(optimizer="adam", loss="KLDivergence", metrics=['accuracy']):
     return model
 
 # load, train, save model
-
 model = model()
-#fit model
-model.fit(X_train, y_train, epochs=160, validation_data=(X_test, y_test))
+
+#call tensorboard
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+
+#fit model and evaluate
+model.fit(X_train, y_train, epochs=160, validation_data=(X_test, y_test), callbacks=[tensorboard_callback])
 model.summary()
 model.evaluate(X_test, y_test)
 
 #save model
-model.save('c4_model_l')
+#model.save('c4_model_l')'''
 

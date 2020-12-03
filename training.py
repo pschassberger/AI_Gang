@@ -7,6 +7,7 @@ import csv
 """
 Create training data for NN, set method of player and number of simulations.
 Data will be stored and manipulated in a dataframe and save it to a csv
+Adjust num_sims for more/less games
 """
 #helper functions
 def clean_data(df_games):
