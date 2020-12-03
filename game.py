@@ -87,12 +87,10 @@ def get_states(game_board):
             my_states.append(game_board[r][c])
     return my_states
 
-
 # controler helpers
 def model_load(model='c4_model'):
     my_model = keras.models.load_model(model)
     return my_model
-
 
 # ai moves
 def ai_move(game_board, my_model, player):
@@ -103,8 +101,9 @@ def ai_move(game_board, my_model, player):
             row = next_open_row(dummy, move)
             place_player(dummy, row, move, player)
             possible_moves.append(to_binary(get_states(dummy)))
-            # load model
-    # my_model = keras.models.load_model('c4_model')
+        else:
+            possible_moves.append([99] * 126)
+    #make predictions
     predictions = my_model.predict(np.array(possible_moves), batch_size=7)
     K.clear_session()
     # get highest prediction move
@@ -229,7 +228,6 @@ def draw_game_board(game_board, screen):
     py.display.update()
 
 
-
 def check_events():
     for event in py.event.get():
         mouse_pos = py.mouse.get_pos()
@@ -240,7 +238,6 @@ def check_events():
 
         if event.type == py.MOUSEBUTTONDOWN:
             if quit_game_button.isOver(mouse_pos):
-                game = False
                 py.quit()
                 quit()
 
@@ -329,8 +326,7 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         # update game with moves
         if display is True:
             draw_game_board(game_board, screen)
-
-        check_events()
+            check_events()
 
         # check draw
         if check_draw(game_board):

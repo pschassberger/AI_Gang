@@ -12,19 +12,32 @@ from game import game
 
 """
 Main interface for interacting with the game and agent.
+Simulates games with AI, player and random play options
+Loads model specified in def sim
+
 """
 #simulate a given amount of games with AI, player or random
-def sim(number_sims=100):
+
+def sim():
+    total_games = 0
     my_model = keras.models.load_model('c4_model')
 
-    score_board = { "Player 1" : 0,
-                    "Player 2" : 0}
-    for i in range(number_sims):
-        winner = game(method_1="AI", method_2="player", model=my_model, display=True)
+    score_board = { "AI"        : 0, 
+                    "Player 2"  : 0}
+    while True:
+        total_games += 1
+        winner = game(method_1="AI", method_2="random", model=my_model, display=True)
+
         if winner == 1:
-            score_board["Player 1"] += 1
+            score_board["AI"] += 1
         else:
             score_board["Player 2"] += 1
-    return score_board
-scores = sim()
-print(scores)
+
+
+
+    return score_board, total_games
+
+scores, total_games = sim()
+print("Number of Games: ", total_games)
+for key, value in scores.items():
+    print(key, ' : ', value)
