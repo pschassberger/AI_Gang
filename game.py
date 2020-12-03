@@ -26,6 +26,38 @@ WIDTH = COLUMN * SIZE
 HEIGHT = (ROW + 1) * SIZE
 SCREEN_SIZE = (WIDTH, HEIGHT)
 
+# buttons
+class button():
+    def __init__(self, color, x, y, width, height, text=''):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+
+    def draw(self, win, outline=None):
+        # Call this method to draw the button on the screen
+        if outline:
+            py.draw.rect(win, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
+
+        py.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
+
+        if self.text != '':
+            font = py.font.SysFont('calibri', 40)
+            text = font.render(self.text, 1, (0, 0, 0))
+            win.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
+
+    def isOver(self, pos):
+        # Pos is the mouse position or a tuple of (x,y) coordinates
+        if pos[0] > self.x and pos[0] < self.x + self.width:
+            if pos[1] > self.y and pos[1] < self.y + self.height:
+                return True
+        return False
+
+# buttons for future event calling
+quit_game_button = button((0, 0, 255), 600, 25, 100, 50, text="quit")
+new_game_button = button((0, 0, 255), 490, 25, 100, 50, text="reset game")
 
 # helpers
 def initialize_game():
@@ -100,8 +132,11 @@ def random_move(game_board):
 
 def user_move(game_board):
     while True:
+        # check global events
+        check_events()
+        # wait for valid mouse click
         for event in py.event.get():
-            if event.type == py.MOUSEBUTTONDOWN and event.button == 1:
+            if event.type == py.MOUSEBUTTONDOWN:
                 mouseX, mouseY = py.mouse.get_pos()
                 col = int(mouseX / SIZE)
                 return col
@@ -194,6 +229,22 @@ def draw_game_board(game_board, screen):
     py.display.update()
 
 
+
+def check_events():
+    for event in py.event.get():
+        mouse_pos = py.mouse.get_pos()
+        if event.type == py.QUIT:
+            game = False
+            py.quit()
+            quit()
+
+        if event.type == py.MOUSEBUTTONDOWN:
+            if quit_game_button.isOver(mouse_pos):
+                game = False
+                py.quit()
+                quit()
+
+
 # driver code for game
 def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, model=None, display=False,
          training=False):
@@ -226,6 +277,8 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         if display is True:
             py.time.wait(100)
             py.draw.rect(screen, BLACK, (0, 0, WIDTH, SIZE))
+            quit_game_button.draw(screen)
+            py.display.update()
 
         if turn == 0:
             # ai or random move
@@ -277,6 +330,8 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         if display is True:
             draw_game_board(game_board, screen)
 
+        check_events()
+
         # check draw
         if check_draw(game_board):
             history.append(to_binary(get_states(game_board.copy())))
@@ -289,6 +344,8 @@ def game(player1_name="Red", player2_name="Blue", method_1=None, method_2=None, 
         turn = turn % 2
         if not game:
             py.time.wait(500)
+
+
 
     # return outcomes
     if training:
